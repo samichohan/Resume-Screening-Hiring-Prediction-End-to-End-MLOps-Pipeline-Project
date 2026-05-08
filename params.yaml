@@ -1,0 +1,21 @@
+# ============================================================
+# FILE: params.yaml
+# KYA KARTA HAI: Saare important numbers / settings ek jagah
+#                rakhta hai — taaki change karna easy ho
+#
+# SIMPLE MISAAL:
+#   Jaise recipe mein likha ho "2 chamach namak" — agar
+#   zyada namak chahiye toh sirf yahan change karo,
+#   poori recipe dubara likhne ki zaroorat nahi.
+#
+# IMPORTANT: Yeh numbers change karo aur "dvc repro" chalao
+#             → pipeline automatically retrains!
+# ============================================================
+
+data:
+  test_size: 0.2        # 20% data test ke liye (80% train)
+  random_state: 42      # seed number — results reproducible rahe
+
+model:
+  cv: 5                 # cross-validation folds (5-fold CV)
+  scoring: "f1"         # best model choose karne ka metric

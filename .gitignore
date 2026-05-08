@@ -1,0 +1,41 @@
+# ============================================================
+# FILE: .gitignore
+# KYA KARTA HAI: GitHub pe jo files NAHI jaani chahiye
+#                unki list — credentials, large files waghaira
+# ============================================================
+
+# Secret file — kabhi push mat karo!
+.env
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
+
+# Data files — DVC handle karta hai
+data_and_model/*.csv
+data_and_model/*.pkl
+data_and_model/*.joblib
+!data_and_model/.gitkeep
+
+# MLflow local
+mlruns/
+mlartifacts/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kaggle credentials
+kaggle.json

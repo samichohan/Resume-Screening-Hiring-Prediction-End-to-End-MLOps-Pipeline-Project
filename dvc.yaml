@@ -1,0 +1,68 @@
+# ============================================================
+# FILE: dvc.yaml
+# KYA KARTA HAI: DVC pipeline define karta hai —
+#                kaun si file pehle chale, kaun si baad mein
+#
+# SIMPLE MISAAL:
+#   Recipe card ki tarah:
+#   1. Pehle sabziyan laao (data_ingestion)
+#   2. Phir dhoao aur kaato (preprocessing)
+#   3. Phir pakao (train)
+#   4. Phir best dish choose karo (best_model)
+#
+# CHALANE KA TARIKA:
+#   dvc repro
+#   (yeh automatically sari stages ek ek karke chalaata hai)
+# ============================================================
+
+stages:
+
+  # ---- STAGE 1: Data Download ----
+  data_ingestion:
+    cmd: python src/data_ingestion.py
+    # deps = dependencies (yeh files change hon toh dobara chalao)
+    deps:
+      - src/data_ingestion.py
+    # outs = outputs (yeh files DVC track karega)
+    outs:
+      - data_and_model/raw_resume_data.csv
+
+  # ---- STAGE 2: Data Saaf Karo ----
+  preprocessing:
+    cmd: python src/preprocessing.py
+    deps:
+      - src/preprocessing.py
+      - data_and_model/raw_resume_data.csv  # stage 1 ka output
+      - params.yaml
+    outs:
+      - data_and_model/X_train.csv
+      - data_and_model/X_test.csv
+      - data_and_model/y_train.csv
+      - data_and_model/y_test.csv
+
+  # ---- STAGE 3: Models Train Karo ----
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data_and_model/X_train.csv          # stage 2 ka output
+      - data_and_model/X_test.csv
+      - data_and_model/y_train.csv
+      - data_and_model/y_test.csv
+      - params.yaml
+    outs:
+      - data_and_model/model_results.csv
+    # metrics = DVC inhe track karta hai comparison ke liye
+    metrics:
+      - data_and_model/model_results.csv:
+          cache: false
+
+  # ---- STAGE 4: Best Model Choose Karo ----
+  best_model:
+    cmd: python src/best_model.py
+    deps:
+      - src/best_model.py
+      - data_and_model/model_results.csv    # stage 3 ka output
+    outs:
+      - data_and_model/best_model_info.txt:
+          cache: false
