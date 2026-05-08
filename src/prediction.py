@@ -1,47 +1,15 @@
-# ============================================================
-# FILE: src/prediction.py
-# KYA KARTA HAI: Best model load karke ek naye candidate
-#                ke liye prediction karta hai
-#
-# SIMPLE MISAAL:
-#   Trained model ko ek naya resume do,
-#   woh batata hai: "Yeh banda hire hoga ya nahi?"
-#
-# INPUT:  Single candidate ka data (dictionary)
-# OUTPUT: hired = 1 (hoga) ya 0 (nahi hoga)
-#         probability = kitne % chance hai
-# ============================================================
-
 import os
-import glob
 import pickle
-import mlflow
 import pandas as pd
-from dotenv import load_dotenv
-
-load_dotenv()
-
-MLFLOW_URI      = os.getenv("MLFLOW_TRACKING_URI")
-MLFLOW_USER     = os.getenv("MLFLOW_TRACKING_USERNAME")
-MLFLOW_PASSWORD = os.getenv("MLFLOW_TRACKING_PASSWORD")
-
-if MLFLOW_URI:
-    mlflow.set_tracking_uri(MLFLOW_URI)
-if MLFLOW_USER:
-    os.environ["MLFLOW_TRACKING_USERNAME"] = MLFLOW_USER
-if MLFLOW_PASSWORD:
-    os.environ["MLFLOW_TRACKING_PASSWORD"] = MLFLOW_PASSWORD
 
 EDUCATION_MAP  = {"Bachelors": 0, "Masters": 1, "PhD": 2, "High School": 3}
 UNIVERSITY_MAP = {"Tier 1": 0, "Tier 2": 1, "Tier 3": 2}
 COMPANY_MAP    = {"Government": 0, "MNC": 1, "Startup": 2}
 
+MODEL_PATH = "data_and_model/best_model.pkl"
+
 def load_best_model():
-    import pickle
-    # Sabse latest model load karo
-    model_path = r"mlruns\165309380226320171\models\m-e6f7c6c73f6940fca3e383f397fa8e8a\artifacts\model.pkl"
-    print(f"Model load ho raha hai: {model_path}")
-    with open(model_path, "rb") as f:
+    with open(MODEL_PATH, "rb") as f:
         model = pickle.load(f)
     print("Model ready!")
     return model
