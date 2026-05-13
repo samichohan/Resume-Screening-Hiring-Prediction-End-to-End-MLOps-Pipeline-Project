@@ -26,39 +26,41 @@ A complete end-to-end MLOps pipeline for predicting whether a candidate will be 
 ## Project Structure
 
 Project-Resume-MLOps-System/
+
 ├── src/
 
-│   ├── extraction.py        # PySpark - Kaggle se data download
+    │   ├── extraction.py        # PySpark - Kaggle se data download
 
-│   ├── cleaning.py          # PySpark - Data clean
+    │   ├── cleaning.py          # PySpark - Data clean
 
-│   ├── transformation.py    # PySpark - Encode + Split
+    │   ├── transformation.py    # PySpark - Encode + Split
 
-│   ├── load.py              # PySpark - Data verify
+    │   ├── load.py              # PySpark - Data verify
 
-│   ├── train.py             # PySpark ML - 4 models + MLflow
+    │   ├── train.py             # PySpark ML - 4 models + MLflow
 
-│   ├── best_model.py        # MLflow - Best model register
+    │   ├── best_model.py        # MLflow - Best model register
 
-│   └── prediction.py        # Single candidate prediction
+    │   └── prediction.py        # Single candidate prediction
 
 ├── .github/
 
-│   └── workflows/
+      │   └── workflows/
 
-│       └── train.yml        # CI/CD GitHub Actions
+              │       └── train.yml        # CI/CD GitHub Actions
 
 ├── data/
 
-│   ├── raw/                 # Raw data
+      │   ├── raw/                 # Raw data
 
-│   ├── processed/           # Cleaned data
+      │   ├── processed/           # Cleaned data
 
-│   └── transformed/         # Train/Test Parquet files
+      │   └── transformed/         # Train/Test Parquet files
 
 ├── models/
 
-│   └── pipeline/            # PySpark Pipeline saved
+    │   └── pipeline/            # PySpark Pipeline saved
+
 \
 
 ├── app.py                   # FastAPI prediction API
@@ -162,15 +164,6 @@ uvicorn app:app --reload
 ```bash
 streamlit run streamlit_app.py
 ```
-
----
-
-## Links
-
-- **GitHub Repo:** https://github.com/samichohan/Project-Resume-MLOps-System
-- **Live App:** https://project-resume-mlops-system.streamlit.app/
-
----
 
 ## Author
 
