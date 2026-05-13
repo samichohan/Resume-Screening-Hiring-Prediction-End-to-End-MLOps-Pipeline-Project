@@ -8,7 +8,7 @@ streamlit
 pydantic
 python-dotenv
 kaggle
-kagglehub
+kagglehub==0.3.6
 pyyaml
 requests
 pyspark
