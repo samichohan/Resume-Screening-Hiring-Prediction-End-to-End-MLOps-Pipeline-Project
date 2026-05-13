@@ -29,37 +29,37 @@ Project-Resume-MLOps-System/
 
 ├── src/
 
-    │   ├── extraction.py        # PySpark - Kaggle se data download
+        │   ├── extraction.py        # PySpark - Kaggle se data download
 
-    │   ├── cleaning.py          # PySpark - Data clean
+        │   ├── cleaning.py          # PySpark - Data clean
 
-    │   ├── transformation.py    # PySpark - Encode + Split
+        │   ├── transformation.py    # PySpark - Encode + Split
 
-    │   ├── load.py              # PySpark - Data verify
+        │   ├── load.py              # PySpark - Data verify
 
-    │   ├── train.py             # PySpark ML - 4 models + MLflow
+        │   ├── train.py             # PySpark ML - 4 models + MLflow
 
-    │   ├── best_model.py        # MLflow - Best model register
+        │   ├── best_model.py        # MLflow - Best model register
 
-    │   └── prediction.py        # Single candidate prediction
+        │   └── prediction.py        # Single candidate prediction
 
 ├── .github/
 
-      │   └── workflows/
+          │   └── workflows/
 
-              │       └── train.yml        # CI/CD GitHub Actions
+                  │       └── train.yml        # CI/CD GitHub Actions
 
 ├── data/
 
-      │   ├── raw/                 # Raw data
+          │   ├── raw/                 # Raw data
 
-      │   ├── processed/           # Cleaned data
+          │   ├── processed/           # Cleaned data
 
-      │   └── transformed/         # Train/Test Parquet files
+          │   └── transformed/         # Train/Test Parquet files
 
 ├── models/
 
-    │   └── pipeline/            # PySpark Pipeline saved
+        │   └── pipeline/            # PySpark Pipeline saved
 
 \
 
