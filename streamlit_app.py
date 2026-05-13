@@ -54,12 +54,11 @@ if st.button("🔍 Predict!", use_container_width=True):
     with st.spinner("Model is Running... ⏳"):
         try:
             import glob
-            files = glob.glob("mlruns/**/*.pkl", recursive=True)
-            if not files:
-                st.error("Model nahi mila! Pehle train.py chalao.")
+            model_path = "data_and_model/best_model.pkl"
+            if not os.path.exists(model_path):
+                st.error("Model nahi mila!")
             else:
-                latest = max(files, key=os.path.getmtime)
-                with open(latest, "rb") as f:
+                with open(model_path, "rb") as f:
                     model = pickle.load(f)
 
                 input_data = pd.DataFrame([{
