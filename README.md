@@ -10,33 +10,67 @@ A complete end-to-end MLOps pipeline for predicting whether a candidate will be 
 **Records:** 200,000 candidates  
 **Target:** `hired` (0 = Not Hired, 1 = Hired)
 
+
+
+
+
+## Links
+
+- **GitHub Repo:** https://github.com/samichohan/Project-Resume-MLOps-System
+
+- **Live App:** https://project-resume-mlops-system.streamlit.app/
+
 ---
+
 
 ## Project Structure
 
 Project-Resume-MLOps-System/
 ├── src/
+
 │   ├── extraction.py        # PySpark - Kaggle se data download
+
 │   ├── cleaning.py          # PySpark - Data clean
+
 │   ├── transformation.py    # PySpark - Encode + Split
+
 │   ├── load.py              # PySpark - Data verify
+
 │   ├── train.py             # PySpark ML - 4 models + MLflow
+
 │   ├── best_model.py        # MLflow - Best model register
+
 │   └── prediction.py        # Single candidate prediction
+
 ├── .github/
+
 │   └── workflows/
+
 │       └── train.yml        # CI/CD GitHub Actions
+
 ├── data/
+
 │   ├── raw/                 # Raw data
+
 │   ├── processed/           # Cleaned data
+
 │   └── transformed/         # Train/Test Parquet files
+
 ├── models/
+
 │   └── pipeline/            # PySpark Pipeline saved
+\
+
 ├── app.py                   # FastAPI prediction API
+
 ├── streamlit_app.py         # Streamlit web UI
+
 ├── dvc.yaml                 # DVC pipeline stages
+
 ├── params.yaml              # Hyperparameters & config
+
 ├── requirements.txt         # Python dependencies
+
 └── README.md
 
 
