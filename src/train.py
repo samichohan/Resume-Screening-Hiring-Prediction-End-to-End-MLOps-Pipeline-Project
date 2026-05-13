@@ -1,161 +1,154 @@
 # ============================================================
 # FILE: src/train.py
-# KYA KARTA HAI: 4 alag alag ML models train karta hai aur
-#                har ek ka result MLflow mein save karta hai
-#
-# SIMPLE MISAAL:
-#   4 alag ustads se ek hi sawaal ka jawab maango.
-#   Har ustad ki accuracy, speed sab note karo (MLflow).
-#   Phir decide karo kaun best hai.
-#
-# INPUT:  data_and_model/X_train.csv
-#         data_and_model/X_test.csv
-#         data_and_model/y_train.csv
-#         data_and_model/y_test.csv
-# OUTPUT: MLflow experiment runs (DagsHub pe visible honge)
-#         data_and_model/model_results.csv (comparison table)
+# KYA KARTA HAI: PySpark ML models train karta hai
+#                MLflow se experiments track karta hai
 # ============================================================
 
-import os
-import pandas as pd
+from pyspark.sql import SparkSession
+from pyspark.ml.classification import (
+    LogisticRegression,
+    DecisionTreeClassifier,
+    RandomForestClassifier,
+    GBTClassifier
+)
+from pyspark.ml.evaluation import (
+    BinaryClassificationEvaluator,
+    MulticlassClassificationEvaluator
+)
+from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
 import mlflow
-import mlflow.sklearn
-import yaml
-from dotenv import load_dotenv
+import mlflow.spark
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score,
-    f1_score, roc_auc_score
+# 1. Spark Session
+spark = SparkSession.builder.appName("Resume-Hiring-Training").getOrCreate()
+spark.sparkContext.setLogLevel("ERROR")
+
+# 2. Load data (from transformation output)
+train_df = spark.read.parquet("data/transformed/train")
+test_df  = spark.read.parquet("data/transformed/test")
+print("Train:", train_df.count())
+print("Test :", test_df.count())
+
+# 3. MLflow setup
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
+mlflow.set_experiment("Resume_Hiring_MultiModel_Experiment")
+
+# 4. Evaluator (AUC)
+evaluator = BinaryClassificationEvaluator(
+    labelCol="hired",
+    metricName="areaUnderROC"
 )
 
-# ---- ENVIRONMENT VARIABLES LOAD KARO (.env file se) ----
-load_dotenv()
-
-# ---- MLFLOW DAGSHUB SE CONNECT KARO ----
-MLFLOW_URI      = os.getenv("MLFLOW_TRACKING_URI")
-MLFLOW_USER     = os.getenv("MLFLOW_TRACKING_USERNAME")
-MLFLOW_PASSWORD = os.getenv("MLFLOW_TRACKING_PASSWORD")
-
-mlflow.set_tracking_uri("mlruns")
-mlflow.set_experiment("resume-hiring-prediction")
-
-# ---- PARAMS ----
-with open("params.yaml", "r") as f:
-    params = yaml.safe_load(f)
-
-CV           = params["model"]["cv"]
-RANDOM_STATE = params["data"]["random_state"]
-
-def load_data():
-    """Preprocessed data load karo"""
-    X_train = pd.read_csv("data_and_model/X_train.csv")
-    X_test  = pd.read_csv("data_and_model/X_test.csv")
-    y_train = pd.read_csv("data_and_model/y_train.csv").squeeze()
-    y_test  = pd.read_csv("data_and_model/y_test.csv").squeeze()
-    return X_train, X_test, y_train, y_test
-
-def get_metrics(y_true, y_pred, y_proba):
-    """
-    Model ki performance measure karo.
-    
-    METRICS KA MATLAB:
-    - Accuracy:  100 mein se kitne sahi predict hue  (e.g. 94%)
-    - Precision: Jo "hired" bola, unme se kitne sach mein hired the
-    - Recall:    Jo sach mein hired the, unme se kitne pakde
-    - F1:        Precision aur Recall ka balance
-    - ROC-AUC:   Overall model ki quality (1.0 = perfect)
-    """
-    return {
-        "accuracy":  accuracy_score(y_true, y_pred),
-        "precision": precision_score(y_true, y_pred, zero_division=0),
-        "recall":    recall_score(y_true, y_pred, zero_division=0),
-        "f1":        f1_score(y_true, y_pred, zero_division=0),
-        "roc_auc":   roc_auc_score(y_true, y_proba)
+# 5. Models dictionary
+models = {
+    "LogisticRegression": {
+        "model": LogisticRegression(labelCol="hired", featuresCol="features"),
+        "params": {
+            "regParam": [0.01, 0.1],
+            "elasticNetParam": [0.0, 0.5]
+        }
+    },
+    "DecisionTree": {
+        "model": DecisionTreeClassifier(labelCol="hired", featuresCol="features"),
+        "params": {
+            "maxDepth": [3, 5, 7],
+            "minInstancesPerNode": [1, 5]
+        }
+    },
+    "RandomForest": {
+        "model": RandomForestClassifier(labelCol="hired", featuresCol="features"),
+        "params": {
+            "numTrees": [50, 100],
+            "maxDepth": [5, 10]
+        }
+    },
+    "GradientBoosting": {
+        "model": GBTClassifier(labelCol="hired", featuresCol="features"),
+        "params": {
+            "maxDepth": [3, 5],
+            "maxIter": [20, 50]
+        }
     }
+}
 
-def train_and_log(name, model, X_train, X_test, y_train, y_test):
-    """
-    Ek model train karo aur MLflow mein log karo.
-    
-    MLflow KYA SAVE KARTA HAI:
-    - Model ka naam
-    - Settings (hyperparameters)
-    - Accuracy, F1 waghaira (metrics)
-    - Actual trained model file
-    """
-    print(f"\nTraining: {name}...")
+# 6. Track best model
+best_model_name = None
+best_auc        = 0.0
+best_model      = None
 
+# 7. Training loop
+for name, config in models.items():
+    print(f"\nTraining {name}...")
     with mlflow.start_run(run_name=name):
-        # Model train karo
-        model.fit(X_train, y_train)
+        model = config["model"]
 
-        # Predictions lao
-        y_pred  = model.predict(X_test)
-        y_proba = model.predict_proba(X_test)[:, 1]
+        # Build param grid
+        paramGrid = ParamGridBuilder()
+        for k, v in config["params"].items():
+            paramGrid = paramGrid.addGrid(getattr(model, k), v)
+        paramGrid = paramGrid.build()
 
-        # Metrics calculate karo
-        metrics = get_metrics(y_test, y_pred, y_proba)
-
-        # MLflow mein log karo
-        mlflow.log_params(model.get_params())   # settings save
-        mlflow.log_metrics(metrics)             # scores save
-        mlflow.sklearn.log_model(               # model file save
-            model,
-            artifact_path="model",
-            registered_model_name=f"resume_{name.lower().replace(' ', '_')}"
+        # Cross validation
+        cv = CrossValidator(
+            estimator=model,
+            estimatorParamMaps=paramGrid,
+            evaluator=evaluator,
+            numFolds=3
         )
+        cv_model = cv.fit(train_df)
+        predictions = cv_model.transform(test_df)
+        auc = evaluator.evaluate(predictions)
 
-        print(f"  Accuracy:  {metrics['accuracy']:.4f}")
-        print(f"  F1 Score:  {metrics['f1']:.4f}")
-        print(f"  ROC AUC:   {metrics['roc_auc']:.4f}")
-        print(f"  MLflow Run ID: {mlflow.active_run().info.run_id}")
+        # Accuracy
+        acc_eval = MulticlassClassificationEvaluator(
+            labelCol="hired", metricName="accuracy")
+        accuracy = acc_eval.evaluate(predictions)
 
-    return {**{"model_name": name}, **metrics}
+        # F1
+        f1_eval = MulticlassClassificationEvaluator(
+            labelCol="hired", metricName="f1")
+        f1 = f1_eval.evaluate(predictions)
 
-def train_all():
-    print("=" * 50)
-    print("Step 3: Model Training Shuru...")
-    print("=" * 50)
+        # Precision
+        prec_eval = MulticlassClassificationEvaluator(
+            labelCol="hired", metricName="weightedPrecision")
+        precision = prec_eval.evaluate(predictions)
 
-    X_train, X_test, y_train, y_test = load_data()
-    print(f"Train rows: {len(X_train)}, Test rows: {len(X_test)}")
+        # Recall
+        rec_eval = MulticlassClassificationEvaluator(
+            labelCol="hired", metricName="weightedRecall")
+        recall = rec_eval.evaluate(predictions)
 
-    # ---- 4 MODELS DEFINE KARO ----
-    # Har model ek alag tareeqa hai data se seekhne ka
-    models = {
-        "Logistic Regression": LogisticRegression(
-            max_iter=200, random_state=RANDOM_STATE
-        ),
-        "Decision Tree": DecisionTreeClassifier(
-            max_depth=10, random_state=RANDOM_STATE
-        ),
-        "Random Forest": RandomForestClassifier(
-            n_estimators=100, random_state=RANDOM_STATE, n_jobs=-1
-        ),
-        "Gradient Boosting": GradientBoostingClassifier(
-            n_estimators=100, random_state=RANDOM_STATE
-        ),
-    }
+        # MLflow log
+        mlflow.log_param("model", name)
+        mlflow.log_metric("AUC",       auc)
+        mlflow.log_metric("accuracy",  accuracy)
+        mlflow.log_metric("f1",        f1)
+        mlflow.log_metric("precision", precision)
+        mlflow.log_metric("recall",    recall)
+        mlflow.log_param("model_saved", "local")
 
-    # ---- HAR MODEL KO TRAIN KARO ----
-    all_results = []
-    for name, model in models.items():
-        result = train_and_log(name, model, X_train, X_test, y_train, y_test)
-        all_results.append(result)
+        print(f"AUC:       {auc:.4f}")
+        print(f"Accuracy:  {accuracy:.4f}")
+        print(f"F1:        {f1:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall:    {recall:.4f}")
 
-    # ---- COMPARISON TABLE SAVE KARO ----
-    results_df = pd.DataFrame(all_results)
-    results_df = results_df.sort_values("f1", ascending=False)
-    results_df.to_csv("data_and_model/model_results.csv", index=False)
+        # Track best
+        if auc > best_auc:
+            best_auc        = auc
+            best_model      = cv_model.bestModel
+            best_model_name = name
 
-    print("\n" + "=" * 50)
-    print("ALL MODELS RESULTS:")
-    print("=" * 50)
-    print(results_df.to_string(index=False))
-    print("\nStep 3 Complete!\n")
+# 8. Final summary
+print("\n===================================")
+print("BEST MODEL:", best_model_name)
+print("BEST AUC  :", best_auc)
+print("===================================")
 
-if __name__ == "__main__":
-    train_all()
+# 9. Save best model
+mlflow.log_param("model_type", name)
+mlflow.spark.log_model(best_model, "best_model")
+print("\nTraining Completed Successfully")
+
+spark.stop()
