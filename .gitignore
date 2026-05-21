@@ -44,3 +44,10 @@ data/processed/
 data/transformed/
 mlruns/
 miruns/
+
+mlflow.db
+data/
+models/best_model.pkl
+*.parquet
+*.pkl
+*.db
