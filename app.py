@@ -17,23 +17,12 @@ UNIVERSITY_MAP = {"Tier 1": 0, "Tier 2":1,"Tier 3": 2}
 COMPANY_MAP = {"Government":0,"MNC": 1, "Startup": 2,"Mid-size": 3}
 
 def load_model():
-    patterns = [
-    "mlruns/**/*.pkl",
-    "mlruns/**/**/*.pkl",
-    ]
-    all_files = []
-    for pattern in patterns:
-        all_files.extend(glob.glob(pattern,recursive=True))
-
-    if not all_files:
-        raise Exception("Model nahi mila Pehle train.py chalao")
-    
-    latest = max(all_files,key=os.path.getmtime)
-    print(f"Model load ho raha hai: {latest}")
-    with open(latest, 'rb') as f:
+    model_path = "models/best_model.pkl"
+    if not os.path.exists(model_path):
+        raise Exception("Model nahi mila!")
+    with open(model_path, "rb") as f:
         model = pickle.load(f)
     return model
-
 class CandidateInput(BaseModel):
     age: int = Field(default=25)
     education_level: Literal["Bachelors", "Masters", "Phd", "High School"] = Field(default="Bachelors")
