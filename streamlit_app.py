@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 
 st.set_page_config(
     page_title="Resume Hiring Prediction",
@@ -6,8 +7,10 @@ st.set_page_config(
     layout="wide"
 )
 
+FASTAPI_URL = "http://localhost:8000"
+
 st.title("📄 Resume Hiring Prediction")
-st.markdown("### Candidate fill Information")
+st.markdown("### Candidate Information")
 st.markdown("---")
 
 col1, col2 = st.columns(2)
@@ -15,10 +18,19 @@ col1, col2 = st.columns(2)
 with col1:
     st.subheader("👤 Personal Info")
     age = st.slider("Age", min_value=18, max_value=60, value=25)
-    education_level = st.selectbox("Education Level", ["Bachelors", "Masters", "PhD", "High School"])
-    university_tier = st.selectbox("University Tier", ["Tier 1", "Tier 2", "Tier 3"])
+    education_level = st.selectbox(
+        "Education Level",
+        ["Bachelors", "Masters", "Phd", "High School"]
+    )
+    university_tier = st.selectbox(
+        "University Tier",
+        ["Tier 1", "Tier 2", "Tier 3"]
+    )
     cgpa = st.slider("CGPA", min_value=0.0, max_value=10.0, value=7.0, step=0.1)
-    company_type = st.selectbox("Company Type", ["MNC", "Startup", "Government", "Mid-size"])
+    company_type = st.selectbox(
+        "Company Type",
+        ["MNC", "Startup", "Government", "Mid-size"]
+    )
 
 with col2:
     st.subheader("💼 Experience & Skills")
@@ -27,7 +39,7 @@ with col2:
     programming_languages = st.number_input("Programming Languages", min_value=0, max_value=20, value=1)
     certifications = st.number_input("Certifications", min_value=0, max_value=20, value=0)
     experience_years = st.slider("Experience (years)", min_value=0.0, max_value=30.0, value=0.0, step=0.5)
-    hackathons = st.number_input("Total Hackathons", min_value=0, max_value=20, value=0)
+    hackathons = st.number_input("Hackathons", min_value=0, max_value=20, value=0)
     research_papers = st.number_input("Research Papers", min_value=0, max_value=20, value=0)
 
 st.markdown("---")
@@ -43,57 +55,55 @@ resume_length_words = st.slider("Resume Word Count", min_value=50, max_value=100
 st.markdown("---")
 
 if st.button("🔍 Predict!", use_container_width=True):
-    import pickle
-    import pandas as pd
-    import os
+    with st.spinner("Processing... ⏳"):
+        payload = {
+            "age": age,
+            "education_level": education_level,
+            "university_tier": university_tier,
+            "cgpa": cgpa,
+            "internships": int(internships),
+            "projects": int(projects),
+            "programming_languages": int(programming_languages),
+            "certifications": int(certifications),
+            "experience_years": experience_years,
+            "hackathons": int(hackathons),
+            "research_papers": int(research_papers),
+            "skills_score": skills_score,
+            "soft_skills_score": soft_skills_score,
+            "resume_length_words": int(resume_length_words),
+            "company_type": company_type
+        }
 
-    EDUCATION_MAP  = {"Bachelors": 0, "Masters": 1, "PhD": 2, "High School": 3}
-    UNIVERSITY_MAP = {"Tier 1": 0, "Tier 2": 1, "Tier 3": 2}
-    COMPANY_MAP    = {"Government": 0, "MNC": 1, "Startup": 2, "Mid-size": 3}
-
-    with st.spinner("Model is Running... ⏳"):
         try:
-            import glob
-            model_path = "data_and_model/best_model.pkl"
-            if not os.path.exists(model_path):
-                st.error("Model nahi mila!")
-            else:
-                with open(model_path, "rb") as f:
-                    model = pickle.load(f)
+            response = requests.post(
+                f"{FASTAPI_URL}/predict",
+                json=payload
+            )
 
-                input_data = pd.DataFrame([{
-                    "age": age,
-                    "education_level": EDUCATION_MAP.get(education_level, 0),
-                    "university_tier": UNIVERSITY_MAP.get(university_tier, 1),
-                    "cgpa": cgpa,
-                    "internships": internships,
-                    "projects": projects,
-                    "programming_languages": programming_languages,
-                    "certifications": certifications,
-                    "experience_years": experience_years,
-                    "hackathons": hackathons,
-                    "research_papers": research_papers,
-                    "skills_score": skills_score,
-                    "soft_skills_score": soft_skills_score,
-                    "resume_length_words": resume_length_words,
-                    "company_type": COMPANY_MAP.get(company_type, 1),
-                }])
-
-                prediction = model.predict(input_data)[0]
-                probability = model.predict_proba(input_data)[0][1]
+            if response.status_code == 200:
+                result = response.json()
 
                 st.markdown("## 🎯 Prediction Result")
-                if prediction == 1:
-                    st.success(f"## ✅ Hired!")
-                    st.balloons()
+
+                if result["hired"] == 1:
+                    st.success(f"## ✅ {result['verdict']}")
+                    
                 else:
-                    st.error(f"## ❌ Not Hired")
+                    st.error(f"## ❌ {result['verdict']}")
 
-                st.markdown(f"### Probability: **{probability*100:.1f}%**")
-                st.progress(float(probability))
+                st.markdown(f"### Probability: **{result['probability']*100:.1f}%**")
+                st.progress(float(result["probability"]))
 
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
+                st.markdown("---")
+                st.markdown("**Input Data:**")
+                st.json(payload)
+
+            else:
+                st.error(f"❌ Error: {response.json()}")
+
+        except requests.exceptions.ConnectionError:
+            st.error("❌ FastAPI chal nahi rahi! Pehle chalao:")
+            st.code("uvicorn app:app --reload")
 
 st.markdown("---")
 st.markdown("*Resume Hiring Prediction MLOps Project*")

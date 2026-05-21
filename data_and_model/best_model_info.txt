@@ -1,3 +1,0 @@
-model_name=Resume_Hiring_Model
-run_id=482a5073eab94ee29f3fcfce88a352a6
-auc=0.5555
