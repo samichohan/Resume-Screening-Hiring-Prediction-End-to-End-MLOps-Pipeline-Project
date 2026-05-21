@@ -39,3 +39,8 @@ Thumbs.db
 
 # Kaggle credentials
 kaggle.json
+data/raw/
+data/processed/
+data/transformed/
+mlruns/
+miruns/
