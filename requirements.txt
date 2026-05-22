@@ -5,17 +5,7 @@ pandas
 numpy
 scikit-learn
 mlflow
-pyspark
-kaggle
-<<<<<<< HEAD
-kagglehub
-pyyaml
 python-dotenv
-requests
-dvc
-=======
-kagglehub==0.3.6
 pyyaml
 requests
-pyspark
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
+pickle5
