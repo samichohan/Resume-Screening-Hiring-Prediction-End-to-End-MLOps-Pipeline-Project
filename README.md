@@ -1,20 +1,11 @@
-# \---
-
-# title: Resume Hiring Prediction
-
-# emoji: 📄
-
-# colorFrom: blue
-
-# colorTo: green
-
-# sdk: docker
-
-# app\_file: app.py
-
-# pinned: false
-
-# \---
+---
+title: Resume Hiring Prediction
+emoji: 📄
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
 
 # Resume Hiring Prediction — MLOps Project
 
