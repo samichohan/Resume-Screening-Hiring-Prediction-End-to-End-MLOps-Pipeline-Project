@@ -1,40 +1,42 @@
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Literal
-<<<<<<< HEAD
 import glob
 import pickle
 import pandas as pd
 import os
-=======
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 
 app = FastAPI(
-    title= "Resume Hiring Prediction API",
-    description= "Candidate ka resume data do,model batayega hired hoga ya nhi",
-    version= '1.0.0' 
+    title="Resume Hiring Prediction API",
+    description="Candidate ka resume data do, model batayega hired hoga ya nhi",
+    version="1.0.0"
 )
 
-<<<<<<< HEAD
-EDUCATION_MAP = {'Bachelors': 0,'Masters':1,'Phd': 2, "High School": 3}
-UNIVERSITY_MAP = {"Tier 1": 0, "Tier 2":1,"Tier 3": 2}
-COMPANY_MAP = {"Government":0,"MNC": 1, "Startup": 2,"Mid-size": 3}
+EDUCATION_MAP = {'Bachelors': 0, 'Masters': 1, 'Phd': 2, "High School": 3}
+UNIVERSITY_MAP = {"Tier 1": 0, "Tier 2": 1, "Tier 3": 2}
+COMPANY_MAP = {"Government": 0, "MNC": 1, "Startup": 2, "Mid-size": 3}
 
 def load_model():
-    model_path = "models/best_model.pkl"
-    if not os.path.exists(model_path):
-        raise Exception("Model nahi mila!")
-    with open(model_path, "rb") as f:
+    patterns = [
+        "models/best_model.pkl",
+        "mlruns/**/models/*/artifacts/model.pkl",
+        "mlruns/**/*.pkl",
+    ]
+    all_files = []
+    for pattern in patterns:
+        all_files.extend(glob.glob(pattern, recursive=True))
+    if not all_files:
+        raise Exception("Model nahi mila! Pehle train.py chalao.")
+    latest = max(all_files, key=os.path.getmtime)
+    print(f"Model load ho raha hai: {latest}")
+    with open(latest, 'rb') as f:
         model = pickle.load(f)
     return model
+
 class CandidateInput(BaseModel):
     age: int = Field(default=25)
     education_level: Literal["Bachelors", "Masters", "Phd", "High School"] = Field(default="Bachelors")
-=======
-class CandidateInput(BaseModel):
-    age: int = Field(default=25)
-    education_level: Literal["Bachelors", "Masters", "PhD", "High School"] = Field(default="Bachelors")
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
     university_tier: Literal["Tier 1", "Tier 2", "Tier 3"] = Field(default="Tier 2")
     cgpa: float = Field(default=7.0)
     internships: int = Field(default=0)
@@ -50,13 +52,9 @@ class CandidateInput(BaseModel):
     company_type: Literal["MNC", "Startup", "Government", "Mid-size"] = Field(default="MNC")
 
 class PredictionOutput(BaseModel):
-<<<<<<< HEAD
     hired: int
     probability: float
     verdict: str
-=======
-    message: str
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 
 @app.get("/")
 def home():
@@ -68,43 +66,34 @@ def home():
 @app.post("/predict", response_model=PredictionOutput)
 def get_prediction(candidate: CandidateInput):
     try:
-<<<<<<< HEAD
         model = load_model()
         input_data = pd.DataFrame([{
-            "age":                   candidate.age,
-            "education_level":       EDUCATION_MAP.get(candidate.education_level, 0),
-            "university_tier":       UNIVERSITY_MAP.get(candidate.university_tier, 1),
-            "cgpa":                  candidate.cgpa,
-            "internships":           candidate.internships,
-            "projects":              candidate.projects,
+            "age": candidate.age,
+            "education_level": EDUCATION_MAP.get(candidate.education_level, 0),
+            "university_tier": UNIVERSITY_MAP.get(candidate.university_tier, 1),
+            "cgpa": candidate.cgpa,
+            "internships": candidate.internships,
+            "projects": candidate.projects,
             "programming_languages": candidate.programming_languages,
-            "certifications":        candidate.certifications,
-            "experience_years":      candidate.experience_years,
-            "hackathons":            candidate.hackathons,
-            "research_papers":       candidate.research_papers,
-            "skills_score":          candidate.skills_score,
-            "soft_skills_score":     candidate.soft_skills_score,
-            "resume_length_words":   candidate.resume_length_words,
-            "company_type":          COMPANY_MAP.get(candidate.company_type, 1),
+            "certifications": candidate.certifications,
+            "experience_years": candidate.experience_years,
+            "hackathons": candidate.hackathons,
+            "research_papers": candidate.research_papers,
+            "skills_score": candidate.skills_score,
+            "soft_skills_score": candidate.soft_skills_score,
+            "resume_length_words": candidate.resume_length_words,
+            "company_type": COMPANY_MAP.get(candidate.company_type, 1),
         }])
-        prediction  = model.predict(input_data)[0]
+        prediction = model.predict(input_data)[0]
         probability = model.predict_proba(input_data)[0][1]
         return {
-            "hired":       int(prediction),
+            "hired": int(prediction),
             "probability": round(float(probability), 4),
-            "verdict":     "Hired!" if prediction == 1 else "Not Hired"
+            "verdict": "Hired!" if prediction == 1 else "Not Hired"
         }
-=======
-        return {"message": f"Data received! Age: {candidate.age}, CGPA: {candidate.cgpa}"}
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
 def health_check():
-<<<<<<< HEAD
     return {"status": "healthy"}
-    
-=======
-    return {"status": "healthy"}
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
