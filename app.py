@@ -1,10 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Literal
+<<<<<<< HEAD
 import glob
 import pickle
 import pandas as pd
 import os
+=======
+>>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 
 app = FastAPI(
     title= "Resume Hiring Prediction API",
@@ -12,6 +15,7 @@ app = FastAPI(
     version= '1.0.0' 
 )
 
+<<<<<<< HEAD
 EDUCATION_MAP = {'Bachelors': 0,'Masters':1,'Phd': 2, "High School": 3}
 UNIVERSITY_MAP = {"Tier 1": 0, "Tier 2":1,"Tier 3": 2}
 COMPANY_MAP = {"Government":0,"MNC": 1, "Startup": 2,"Mid-size": 3}
@@ -26,6 +30,11 @@ def load_model():
 class CandidateInput(BaseModel):
     age: int = Field(default=25)
     education_level: Literal["Bachelors", "Masters", "Phd", "High School"] = Field(default="Bachelors")
+=======
+class CandidateInput(BaseModel):
+    age: int = Field(default=25)
+    education_level: Literal["Bachelors", "Masters", "PhD", "High School"] = Field(default="Bachelors")
+>>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
     university_tier: Literal["Tier 1", "Tier 2", "Tier 3"] = Field(default="Tier 2")
     cgpa: float = Field(default=7.0)
     internships: int = Field(default=0)
@@ -41,9 +50,13 @@ class CandidateInput(BaseModel):
     company_type: Literal["MNC", "Startup", "Government", "Mid-size"] = Field(default="MNC")
 
 class PredictionOutput(BaseModel):
+<<<<<<< HEAD
     hired: int
     probability: float
     verdict: str
+=======
+    message: str
+>>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 
 @app.get("/")
 def home():
@@ -55,6 +68,7 @@ def home():
 @app.post("/predict", response_model=PredictionOutput)
 def get_prediction(candidate: CandidateInput):
     try:
+<<<<<<< HEAD
         model = load_model()
         input_data = pd.DataFrame([{
             "age":                   candidate.age,
@@ -80,10 +94,17 @@ def get_prediction(candidate: CandidateInput):
             "probability": round(float(probability), 4),
             "verdict":     "Hired!" if prediction == 1 else "Not Hired"
         }
+=======
+        return {"message": f"Data received! Age: {candidate.age}, CGPA: {candidate.cgpa}"}
+>>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
 def health_check():
+<<<<<<< HEAD
     return {"status": "healthy"}
     
+=======
+    return {"status": "healthy"}
+>>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
