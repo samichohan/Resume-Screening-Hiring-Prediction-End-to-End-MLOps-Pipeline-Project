@@ -3,12 +3,14 @@
 # KYA KARTA HAI: PySpark ML models train karta hai
 #                MLflow se experiments track karta hai
 # ============================================================
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from pyspark.sql import SparkSession
 from pyspark.ml.classification import (
     LogisticRegression,
     DecisionTreeClassifier,
-    RandomForestClassifier,
+    RandomForestClassifier, 
     GBTClassifier
 )
 from pyspark.ml.evaluation import (
@@ -31,7 +33,7 @@ print("Test :", test_df.count())
 
 # 3. MLflow setup
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
-mlflow.set_experiment("Resume_Hiring_MultiModel_Experiment")
+mlflow.set_experiment('Resume_Hiring_MultiModel_Experiment')
 
 # 4. Evaluator (AUC)
 evaluator = BinaryClassificationEvaluator(
@@ -60,7 +62,7 @@ models = {
         "params": {
             "numTrees": [50, 100],
             "maxDepth": [5, 10]
-        }
+        }    
     },
     "GradientBoosting": {
         "model": GBTClassifier(labelCol="hired", featuresCol="features"),
