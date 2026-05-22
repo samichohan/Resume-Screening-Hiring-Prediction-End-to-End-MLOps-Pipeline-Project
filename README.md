@@ -19,9 +19,6 @@ A complete end-to-end MLOps pipeline for predicting whether a candidate will be 
 **Records:** 200,000 candidates  
 **Target:** `hired` (0 = Not Hired, 1 = Hired)
 
-<<<<<<< HEAD
-\---
-=======
 
 
 
@@ -30,10 +27,8 @@ A complete end-to-end MLOps pipeline for predicting whether a candidate will be 
 
 - **GitHub Repo:** https://github.com/samichohan/Project-Resume-MLOps-System
 
-- **Live App:** https://project-resume-mlops-system.streamlit.app/
+- **Live App:** https://samichohan-resume-hiring-prediction.hf.space/
 
----
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 
 
 ## Project Structure
@@ -41,82 +36,50 @@ A complete end-to-end MLOps pipeline for predicting whether a candidate will be 
 Project-Resume-MLOps-System/
 
 ├── src/
-<<<<<<< HEAD
+
+
 │   ├── extraction.py        # PySpark - Kaggle se data download
+
 │   ├── cleaning.py          # PySpark - Data clean
+
 │   ├── transformation.py    # PySpark - Encode + Split
+
 │   ├── load.py              # PySpark - Data verify
+
 │   ├── train.py             # PySpark ML - 4 models + MLflow
+
 │   ├── best\_model.py        # MLflow - Best model register
+
 │   └── prediction.py        # Single candidate prediction
+
 ├── .github/
+
 │   └── workflows/
+
 │       └── train.yml        # CI/CD GitHub Actions
+
 ├── data/
+
 │   ├── raw/                 # Raw data
+
 │   ├── processed/           # Cleaned data
 │   └── transformed/         # Train/Test Parquet files
+
 ├── models/
+
 │   └── pipeline/            # PySpark Pipeline saved
+
 ├── app.py                   # FastAPI prediction API
+
 ├── streamlit\_app.py         # Streamlit web UI
+
 ├── dvc.yaml                 # DVC pipeline stages
+
 ├── params.yaml              # Hyperparameters \& config
-├── requirements.txt         # Python dependencies
-└── README.md
-=======
-
-        │   ├── extraction.py        # PySpark - Kaggle se data download
-
-        │   ├── cleaning.py          # PySpark - Data clean
-
-        │   ├── transformation.py    # PySpark - Encode + Split
-
-        │   ├── load.py              # PySpark - Data verify
-
-        │   ├── train.py             # PySpark ML - 4 models + MLflow
-
-        │   ├── best_model.py        # MLflow - Best model register
-
-        │   └── prediction.py        # Single candidate prediction
-
-├── .github/
-
-          │   └── workflows/
-
-                  │       └── train.yml        # CI/CD GitHub Actions
-
-├── data/
-
-          │   ├── raw/                 # Raw data
-
-          │   ├── processed/           # Cleaned data
-
-          │   └── transformed/         # Train/Test Parquet files
-
-├── models/
-
-        │   └── pipeline/            # PySpark Pipeline saved
-
-\
-
-├── app.py                   # FastAPI prediction API
-
-├── streamlit_app.py         # Streamlit web UI
-
-├── dvc.yaml                 # DVC pipeline stages
-
-├── params.yaml              # Hyperparameters & config
 
 ├── requirements.txt         # Python dependencies
 
 └── README.md
-
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
-
-
-
-\---
 
 ## Tech Stack
 
@@ -262,7 +225,7 @@ streamlit run streamlit\_app.py
 ## Links
 
 * **GitHub Repo:** https://github.com/samichohan/Project-Resume-MLOps-System
-* **Live App:** https://project-resume-mlops-system.streamlit.app/
+* **Live App:** https://samichohan-resume-hiring-prediction.hf.space/
 
 \---
 
@@ -271,13 +234,10 @@ streamlit run streamlit\_app.py
 ```bash
 streamlit run streamlit_app.py
 ```
-
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 ## Author
 
 **Abdul Sami Chohan**  
 GitHub: [@samichohan](https://github.com/samichohan)
-<<<<<<< HEAD
 
-=======
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
+
+
