@@ -220,7 +220,7 @@ pip install -r requirements.txt
 
 ### 5\. Run Pipeline Step by Step
 
-```bash
+
 python src/extraction.py
 python src/cleaning.py
 python src/transformation.py
