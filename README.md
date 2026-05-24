@@ -83,60 +83,100 @@ Project-Resume-MLOps-System/
 
 ## Tech Stack
 
-<<<<<<< HEAD
+
 |Tool|Purpose|
+
 |-|-|
+
 |Python|Core language|
+
 |PySpark|ETL - Data extraction, cleaning, transformation|
+
 |Scikit-learn|ML models training|
+
 |MLflow|Experiment tracking \& model registry|
+
 |DVC|Data \& pipeline versioning|
+
 |FastAPI|REST API for predictions|
+
 |Streamlit|Web UI for predictions|
+
 |GitHub Actions|CI/CD automation|
-=======
+
+
 | Tool | Purpose |
+
 |------|---------|
+
 | Python | Core language |
 | PySpark | ETL - Data extraction, cleaning, transformation |
-| Scikit-learn | ML models training |
-| MLflow | Experiment tracking & model registry |
-| DVC | Data & pipeline versioning |
-| FastAPI | REST API for predictions |
-| Streamlit | Web UI for predictions |
-| GitHub Actions | CI/CD automation |
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 
-\---
+| Scikit-learn | ML models training |
+
+
+| MLflow | Experiment tracking & model registry |
+
+| DVC | Data & pipeline versioning |
+
+| FastAPI | REST API for predictions |
+
+
+| Streamlit | Web UI for predictions |
+
+| GitHub Actions | CI/CD automation |
+
+
+
+
 
 ## PySpark Pipeline
 
+
 Kaggle Dataset
+
 ↓
+
 extraction.py    →  PySpark: CSV load → data/raw/
+
 ↓
+
 cleaning.py      →  PySpark: Remove nulls, duplicates
+
 ↓
+
 transformation.py → PySpark: StringIndexer + OHE + Scaler
+
 ↓
+
 load.py          →  PySpark: Verify data
+
+
 ↓
+
 train.py         →  PySpark ML: 4 models + MLflow track
+
 ↓
-<<<<<<< HEAD
+
+
 best\_model.py    →  MLflow: Best model register
+
+
 ↓
+
 FastAPI + Streamlit → Prediction UI
-=======
+
+
 best_model.py    →  MLflow: Best model register
+
 ↓
+
 FastAPI + Streamlit → Prediction UI
 
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
 
 
 
-\---
+
 
 ## Models Trained
 
@@ -147,7 +187,7 @@ FastAPI + Streamlit → Prediction UI
 |Random Forest|Ensemble of trees|
 |Gradient Boosting|Boosted ensemble|
 
-\---
+
 
 ## Getting Started
 
@@ -158,7 +198,6 @@ git clone https://github.com/samichohan/Project-Resume-MLOps-System.git
 cd Project-Resume-MLOps-System
 ```
 
-<<<<<<< HEAD
 ### 2\. Install Java 17
 
 Download from: https://www.oracle.com/java/technologies/downloads/#java17-windows
@@ -167,13 +206,13 @@ Download from: https://www.oracle.com/java/technologies/downloads/#java17-window
 =======
 ### 2. Install Java 17
 Download from: https://www.oracle.com/java/technologies/downloads/#java17-windows
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
+
 
 ```bash
 pip install -r requirements.txt
 ```
 
-<<<<<<< HEAD
+
 ### 4\. Setup Kaggle API
 
 * https://www.kaggle.com > Account > Settings > API > Create New Token
@@ -192,13 +231,12 @@ python src/best\_model.py
 
 ### 6\. Run FastAPI
 
-=======
 ### 4. Setup Kaggle API
 - https://www.kaggle.com > Account > Settings > API > Create New Token
 - `kaggle.json` → `C:\Users\YourName\.kaggle\kaggle.json`
 
 ### 5. Run Pipeline Step by Step
-```bash
+
 python src/extraction.py
 python src/cleaning.py
 python src/transformation.py
@@ -208,30 +246,27 @@ python src/best_model.py
 ```
 
 ### 6. Run FastAPI
->>>>>>> 2f08a25415f0e13b2343123bed9fbe4f28f09628
-```bash
+
+
 uvicorn app:app --reload
 ```
 
-<<<<<<< HEAD
+
 ### 7\. Run Streamlit UI
 
-```bash
+
 streamlit run streamlit\_app.py
 ```
 
-\---
 
 ## Links
 
 * **GitHub Repo:** https://github.com/samichohan/Project-Resume-MLOps-System
 * **Live App:** https://samichohan-resume-hiring-prediction.hf.space/
 
-\---
 
-=======
 ### 7. Run Streamlit UI
-```bash
+
 streamlit run streamlit_app.py
 ```
 ## Author
